@@ -1,3 +1,4 @@
+import CustomButton from '@/components/CustomButton';
 import { onboarding } from '@/constants';
 import { router } from 'expo-router';
 import { Key, useRef, useState } from 'react';
@@ -12,13 +13,25 @@ export default function Welcome() {
     const swiperRef = useRef<Swiper>(null)
     const [activeIndex, setActiveIndex] = useState(0)
 
+    const handleNext = () => {
+        if (swiperRef.current) {
+            if(activeIndex === onboarding.length - 1){
+                router.navigate('/(auth)/signin')
+                return
+            }
+
+            swiperRef.current.scrollBy(1)
+        }
+    }
+
     return (
-        <SafeAreaView className='flex h-full justify-between'>
+        <SafeAreaView className='flex h-full justify-between bg-white dark:bg-black mb-4'>
             <TouchableOpacity className='w-full flex justify-end items-end p-5'
-                onPress={() => router.replace('/(auth)/signin')}
+                onPress={() => router.navigate('/(auth)/signin')}
             >
-                <Text className='text-black text-md font-JakartaBold' >Skip</Text>
+                <Text className='text-black dark:text-white text-md font-JakartaBold' >Skip</Text>
             </TouchableOpacity>
+
 
             <Swiper
                 ref={swiperRef}
@@ -33,7 +46,7 @@ export default function Welcome() {
                             resizeMode='contain'
                         />
                         <View className='flex flex-row items-center justify-center w-full px-10 text-center' >
-                            <Text className='text-black text-3xl font-bold text-center'>{item.title}</Text>
+                            <Text className='text-black dark:text-white text-3xl font-bold text-center'>{item.title}</Text>
                         </View>
                         <Text className='text-gray-400 text-md font-semibold px-10 text-center'>{item.description}</Text>
                     </View>
@@ -41,6 +54,14 @@ export default function Welcome() {
 
 
             </Swiper>
+            <View className='p-4' >
+                <CustomButton
+                    title={activeIndex === onboarding.length - 1 ? 'Get Started' : 'Next'}
+                    onPress={handleNext}
+                    className='mb-5'
+                    />
+            </View>
+
 
         </SafeAreaView>
     );
