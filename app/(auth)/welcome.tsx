@@ -16,7 +16,7 @@ export default function Welcome() {
     const handleNext = () => {
         if (swiperRef.current) {
             if(activeIndex === onboarding.length - 1){
-                router.navigate('/(auth)/signin')
+                router.navigate('/(auth)/signup')
                 return
             }
 
@@ -27,7 +27,7 @@ export default function Welcome() {
     return (
         <SafeAreaView className='flex h-full justify-between bg-white dark:bg-black mb-4'>
             <TouchableOpacity className='w-full flex justify-end items-end p-5'
-                onPress={() => router.navigate('/(auth)/signin')}
+                onPress={() => router.navigate('/(auth)/signup')}
             >
                 <Text className='text-black dark:text-white text-md font-JakartaBold' >Skip</Text>
             </TouchableOpacity>
