@@ -3,6 +3,7 @@ import InputFeild from '@/components/InputFeild';
 import OAuth from '@/components/OAuth';
 import ThemedView from '@/components/ThemedView';
 import { icons, images } from '@/constants';
+import { fetchAPI } from '@/lib/fetch';
 import { useSignUp } from '@clerk/clerk-expo';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -75,10 +76,21 @@ export default function SignUp() {
                 code,
             })
 
-            console.log(completeSignUp)
+            // console.log(completeSignUp)
 
             if (completeSignUp.status === 'complete') {
                 //TODO: Add User to DB
+
+               const res =  await fetchAPI('/(api)/user', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: form.name,
+                        email: form.email,
+                        clerkId : completeSignUp.createdUserId
+                    }),
+                })
+
+                console.log(res)
 
                 await setActive({ session: completeSignUp.createdSessionId })
                 router.replace('/(root)/(tabs)/home')
