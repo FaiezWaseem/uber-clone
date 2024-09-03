@@ -14,6 +14,8 @@ export default function SignIn() {
 
     const router = useRouter()
 
+    const [isLoading , setLoading] = useState(false)
+
     const [form, setForm] = useState({
         email: '',
         password: '',
@@ -26,12 +28,14 @@ export default function SignIn() {
             return
         }
 
+        setLoading(true)
+        
         try {
             const signInAttempt = await signIn.create({
                 identifier: form.email,
                 password: form.password,
             })
-
+            
             if (signInAttempt.status === 'complete') {
                 await setActive({ session: signInAttempt.createdSessionId })
                 router.replace('/(root)/(tabs)/home')
@@ -41,7 +45,9 @@ export default function SignIn() {
                 console.error(JSON.stringify(signInAttempt, null, 2))
                 setError('Something Went Wrong!!')
             }
+            setLoading(false)
         } catch (err: any) {
+            setLoading(false)
             console.error(JSON.stringify(err, null, 2))
             setError(err.errors[0].longMessage)
         }
@@ -78,7 +84,7 @@ export default function SignIn() {
                     />
                     {error && <Text className='text-red-500 text-center' >{error}</Text>}
 
-                    <CustomButton title='Sign In' className='mt-5' onPress={onSignInPress} />
+                    <CustomButton title='Sign In' className='mt-5' onPress={onSignInPress} isLoading={isLoading} />
 
                     <OAuth />
 
