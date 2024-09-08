@@ -23,7 +23,8 @@ export default function RideCard({ item }: { item: Ride }) {
 
 
     const mapUri = `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${destination_longitude},${destination_latitude}&zoom=14&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_KEY}`
-    console.log(mapUri)
+    const mapUri2 = `https://maps.googleapis.com/maps/api/staticmap?center=${destination_latitude},${destination_longitude}&zoom=11&size=625x235&maptype=roadmap&key=${process.env.EXPO_PUBLIC_STATIC_MAPS_KEY}`
+    console.log(mapUri2)
     return <View className="flex flex-row items-center justify-center bg-white p-1 rounded-lg shadow-sm shadow-neutral-300 mb-3">
         <View className="flex flex-col items-center justify-between p-3" >
             <View className="flex flex-row items-center justify-between" >

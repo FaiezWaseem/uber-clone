@@ -1,7 +1,13 @@
+import GoogleTextInput from '@/components/GoogleTextInput'
+import Map from '@/components/Map'
 import RideCard from '@/components/RideCard'
+import { icons, images } from '@/constants'
+import { useLocationStore } from '@/hooks'
 import { useUser } from '@clerk/clerk-expo'
-import { FlatList, Text } from 'react-native'
+import { useEffect, useState } from 'react'
+import { ActivityIndicator, FlatList, Image, Text, View, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import * as Location from 'expo-location'
 
 const recentRides = [
   {
@@ -103,17 +109,99 @@ const recentRides = [
 ]
 
 export default function Home() {
+
+  const { userAddress, setUserLocation , setDestinationLocation} = useLocationStore()
+ 
   const { user } = useUser()
 
+  const [isLoading, setLoading] = useState(false)
+  const [hasPermission , setHasPermission] = useState(false)
+
+  useEffect(()=>{
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      setHasPermission(status === 'granted');
+
+      if (status === 'granted') {
+        const location = await Location.getCurrentPositionAsync({});
+        const address = await Location.reverseGeocodeAsync({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude
+          });
+
+          setUserLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            address: address[0].region ?? ''
+          })
+      }
+
+    })();
+  },[])
+
+  const handleSignOut = () => {
+
+  }
+  const handlePress = (location : any) => {
+    console.log('pressed', location)
+  }
 
   return (
-    <SafeAreaView className='bg-general-500'>
+    <SafeAreaView className='bg-general-500 dark:bg-slate-800'>
       <FlatList
         data={recentRides?.slice(0, 5)}
-        renderItem={({ item } : { item : any }) => (
+        renderItem={({ item }: { item: any }) => (
           <RideCard item={item} />
         )}
         keyExtractor={item => item.ride_id}
+        className='px-5'
+        keyboardShouldPersistTaps='handled'
+        contentContainerStyle={{ paddingBottom: 100 }}
+        ListEmptyComponent={() => (
+          <View className='flex-1 items-center justify-center'>
+            {isLoading
+              &&
+              <ActivityIndicator color={'#000'} />
+            }
+            {
+              !isLoading &&
+              <Image source={images.noResult} className='w-40 h-40' />
+
+            }
+            {
+              !isLoading &&
+              <Text className='text-center text-sm dark:text-white'>
+                No recent Rides found
+              </Text>
+            }
+          </View>
+        )}
+        ListHeaderComponent={() => (
+          <>
+            <View className='flex-row items-center justify-between px-1'>
+              <Text className='text-xl font-JakartaExtraBold dark:text-white my-5 capitalize'>Welcome {" "} {user?.username || user?.emailAddresses[0].emailAddress}</Text>
+              <TouchableOpacity onPress={handleSignOut} className='justify-center items-center w-10 h-10 bg-white rounded-full' >
+                <Image source={icons.out} className='w-6 h-6' />
+              </TouchableOpacity>
+            </View>
+            <GoogleTextInput
+
+
+              icon={icons.search}
+              containerStyle='bg-white shadow-md shadow-neutral-300 dark:bg-slate-800'
+              handlePress={handlePress}
+
+            />
+            <>
+              <Text className='text-xl font-JakartaBold my-3'>
+                Your Current Location {userAddress}
+              </Text>
+              <View className='flex flex-row items-center bg-transparent h-[300px]' >
+                <Map />
+              </View>
+            </>
+          </>
+        )}
       />
     </SafeAreaView>
   )
