@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { ActivityIndicator, FlatList, Image, Text, View, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as Location from 'expo-location'
+import { router } from 'expo-router'
 
 const recentRides = [
   {
@@ -132,7 +133,7 @@ export default function Home() {
           setUserLocation({
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
-            address: address[0].region ?? ''
+            address: address[0].formattedAddress ?? ''
           })
       }
 
@@ -143,6 +144,9 @@ export default function Home() {
 
   }
   const handlePress = (location : any) => {
+    setDestinationLocation(location)
+
+    router.push('/(root)/find-ride')
     console.log('pressed', location)
   }
 
@@ -193,8 +197,8 @@ export default function Home() {
 
             />
             <>
-              <Text className='text-xl font-JakartaBold my-3'>
-                Your Current Location {userAddress}
+              <Text className='text-lg font-JakartaBold my-3'>
+                Your Location : {userAddress?.substring(0, 50)}...
               </Text>
               <View className='flex flex-row items-center bg-transparent h-[300px]' >
                 <Map />
